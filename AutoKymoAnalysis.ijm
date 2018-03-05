@@ -1,4 +1,6 @@
 /*
+ * Chris Gell
+ * Dec 2018
  * 
  * Semi-automated analysis of kymographs.
  * Load a red-green kymoe, when prompted 
