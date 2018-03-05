@@ -1,15 +1,23 @@
 /*
-
+ * 
+ * Semi-automated analysis of kymographs.
+ * Load a red-green kymoe, when prompted 
 Mark ROIS for bg
 Mark ROI for non-ends
 Mark roi for ends
 
+Then correct the ROIs - at the moment can only delete I think.
 
-Need to make sure all ori are saved
-Need the MT length
-Need total number sof each event
-Best to put these in a log window and save all into a folder with same name as the kymo 
-Write an igor routine that filters out unwanted events (i.e. only one wide).
+TO DO Write an igor routine that filters out unwanted events (i.e. only one wide).
+TO DO Extend the ROI tools so that you remove AND edit and create ROIs
+
+DONE Need to make sure all ori are saved
+DONE Need the MT length
+DONE Need total number sof each event
+DONE Best to put these in a log window and save all into a folder with same name as the kymo 
+
+
+
 
 
 
