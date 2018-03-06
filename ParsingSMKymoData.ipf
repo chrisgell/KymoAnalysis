@@ -79,7 +79,6 @@ end
  
 // LoadAndConcatenateAllFiles(pathName)
 // Loads all files in specified folder with extension specified by kFileNameExtension.
-// The output waves are: DateTimeW, CH4_dry, CO2_dry
 // All loaded waves are concatenated, creating the output waves in the current data folder.
 // If the output waves already exist in the current data folder, this routine appends to them.
 Function LoadEndBindings(pathName)
@@ -88,7 +87,7 @@ Function LoadEndBindings(pathName)
 	Variable index=0
  
 	Wave/D/Z EndBindIndex, EndBindTime
-	if (!WaveExists(EndBindIndex))						// Date/time wave does not exist?
+	if (!WaveExists(EndBindIndex))						
 		// Create the output waves because the code below concatenates	
 		Make/O/N=0/D EndBindIndex, EndBindTime
 	endif
@@ -124,7 +123,7 @@ Function LoadEndBindings(pathName)
  
  if (index ==0)
  
-		// Create wave references for the waves loaded into the temporary data folder
+		// Create wave references for the waves loaded into the temporary data folder, need to account for their naming
 		Wave TimeStampNew = :TimeStamp
 		Wave EventLengthNew = :EventLength
 		
@@ -147,8 +146,6 @@ endif
 		Wave EndBindIndex, EndBindTime
  
  
- //need to sort out why this does not concat here - it works by re-add the same waves.... the first one. Need to make 
- //time stamp new concat the correct wave.
  
 		Concatenate /NP {TimeStampNew}, EndBindIndex
 		Concatenate /NP {EventLengthNew}, EndBindTime
@@ -164,9 +161,53 @@ endif
 	if (Exists("temporaryPath"))		// Kill temp path if it exists
 		KillPath temporaryPath
 	endif
- 
-	Wave EndBindIndex, EndBindTime
+	
+	RmvZeros()
+
 	
  
 	return 0						// Signifies success.
 End
+
+
+
+Function RmvZeros()
+
+ 	//remove zeros
+	Wave EndBindIndex, EndBindTime
+	EndBindIndex = EndBindIndex == 0 ? NaN : EndBindIndex
+	WaveTransform zapNaNs EndBindIndex
+	EndBindTime = EndBindTime == 0 ? NaN : EndBindTime
+	WaveTransform zapNaNs EndBindTime
+
+End
+
+
+Function RunAnalysis()
+
+HistEndTimes()
+
+
+End
+
+
+
+
+
+Function HistEndTimes()
+
+//make a nice hitrogram for the current results
+Wave EndBindTime
+Make/N=50/O EndBindTime_Hist;DelayUpdate
+Histogram/C/B={0.1,0.1,50} EndBindTime,EndBindTime_Hist;DelayUpdate
+Display EndBindTime_Hist
+ModifyGraph mode=5
+Label bottom "Time (s)"
+Label left "Occurance"
+
+
+
+
+End
+
+
