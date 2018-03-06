@@ -4,7 +4,7 @@
  
 Menu "LoadWaves"
 	"Load One File...", LoadOneFile("", "")
-	"Load And Concatenate All Files in Folder...", LoadAndConcatenateAllFiles("")
+	"Load And Concatenate All Files in Folder...", LoadEndBindings("")
 End
 
 
@@ -34,7 +34,17 @@ Function LoadOneFile(pathName, fileName)
 	String thisPathForDF="root:df4"
 	SetCommonDF(thisPathForDF)
  
-	LoadWave /J /D /W /A /K=1 /E=2 /P=$pathName fileName
+ 
+ String columnInfoStr = " "
+	columnInfoStr += "N='TimeStamp';"			// Load DATE column - will become date/time wave
+	columnInfoStr += "N='EventLength';"			// Load TIME column
+ 
+ 
+ 
+ 
+ 
+ 
+	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /E=2 /P=$pathName fileName
 	Variable numWavesLoaded = V_flag			// V_flag is set by LoadWave
 
  
@@ -72,7 +82,7 @@ end
 // The output waves are: DateTimeW, CH4_dry, CO2_dry
 // All loaded waves are concatenated, creating the output waves in the current data folder.
 // If the output waves already exist in the current data folder, this routine appends to them.
-Function LoadAndConcatenateAllFiles(pathName)
+Function LoadEndBindings(pathName)
 	String pathName					// Name of symbolic path or "" to get dialog
 	String fileName
 	Variable index=0
@@ -113,16 +123,16 @@ Function LoadAndConcatenateAllFiles(pathName)
 		endif
  
 		// Create wave references for the waves loaded into the temporary data folder
-		Wave EndBindIndexNew = :EndBindIndex
-		Wave EndBindTimeNew = :EndBindTime
+		Wave TimeStampNew = :TimeStamp
+		Wave EventLengthNew = :EventLength
 		
  
 		SetDataFolder ::				// Back to parent data folder
  
-		Wave DateTimeW, CH4_dry, CO2_dry
+		Wave EndBindIndex, EndBindTime
  
-		Concatenate /NP {EndBindIndexNew}, EndBindIndex
-		Concatenate /NP {EndBindTimeNew}, EndBindTime
+		Concatenate /NP {TimeStampNew}, EndBindIndex
+		Concatenate /NP {EventLengthNew}, EndBindTime
 		
  
 		KillDataFolder $dfName
@@ -136,7 +146,7 @@ Function LoadAndConcatenateAllFiles(pathName)
 		KillPath temporaryPath
 	endif
  
-	Wave EndBindIndex, CH4_dry, CO2_dry
+	Wave EndBindIndex, EndBindTime
 	
  
 	return 0						// Signifies success.
