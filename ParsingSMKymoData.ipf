@@ -122,9 +122,24 @@ Function LoadEndBindings(pathName)
 			break		
 		endif
  
+ if (index ==0)
+ 
 		// Create wave references for the waves loaded into the temporary data folder
 		Wave TimeStampNew = :TimeStamp
 		Wave EventLengthNew = :EventLength
+		
+else 
+
+		String LocTSName=":TimeStamp"+num2str(index)
+		String LocEventLengthName=":EventLength"+num2str(index)
+		
+
+
+
+		Wave TimeStampNew = $LocTSName
+		Wave EventLengthNew =$LocEventLengthName
+		
+endif		
 		
  
 		SetDataFolder ::				// Back to parent data folder
@@ -132,7 +147,7 @@ Function LoadEndBindings(pathName)
 		Wave EndBindIndex, EndBindTime
  
  
- //need to sort out why this does not concat here - it works by re-adds the same waves.... the first one. Need to make 
+ //need to sort out why this does not concat here - it works by re-add the same waves.... the first one. Need to make 
  //time stamp new concat the correct wave.
  
 		Concatenate /NP {TimeStampNew}, EndBindIndex
