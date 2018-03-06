@@ -4,7 +4,7 @@
  
 Menu "LoadWaves"
 	"Load One File...", LoadOneFile("", "")
-	"Load Andc Concatenate All End Bindings...", LoadEndBindings("")
+	"Load And Concatenate All End Bindings...", LoadEndBindings("")
 End
 
 
@@ -43,8 +43,8 @@ Function LoadOneFile(pathName, fileName)
  
  
  
- 
-	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /E=2 /P=$pathName fileName
+ //LoadWave /J /D /W /B=columnInfoStr /A /K=1 /E=2 /P=$pathName fileName
+	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /P=$pathName fileName
 	Variable numWavesLoaded = V_flag			// V_flag is set by LoadWave
 
  
@@ -108,8 +108,19 @@ Function LoadEndBindings(pathName)
 			break									// Break out of loop
 		endif
  
+ 		
+ 
+ 
 		// Load the new data into a temporary data folder
 		String dfName = "TempDataForLoadAndConcatenate"
+		
+		
+		if (DataFolderExists(dfName))
+		
+			KillDataFolder $dfName
+		endif	
+		
+		
 		NewDataFolder/O/S $dfName
  
 		result = LoadOneFile(pathName, fileName)
