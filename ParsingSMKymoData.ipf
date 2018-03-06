@@ -4,11 +4,7 @@
  
 Menu "LoadWaves"
 	"Load One File...", LoadOneFile("", "")
-<<<<<<< HEAD
-	"Load And Concatenate All End Bindings...", LoadEndBindings("")
-=======
-	"Load And Concatenate All Files in Folder...", LoadAndConcatenateAllFiles("")
->>>>>>> parent of c5a2462... Corrected erros so data is concat
+	"Load And Concatenate All Files in Folder...", LoadEndBindings("")
 End
 
 
@@ -38,7 +34,6 @@ Function LoadOneFile(pathName, fileName)
 	String thisPathForDF="root:df4"
 	SetCommonDF(thisPathForDF)
  
-<<<<<<< HEAD
  
  String columnInfoStr = " "
 	columnInfoStr += "N='TimeStamp';"			// Load DATE column - will become date/time wave
@@ -48,11 +43,8 @@ Function LoadOneFile(pathName, fileName)
  
  
  
- //LoadWave /J /D /W /B=columnInfoStr /A /K=1 /E=2 /P=$pathName fileName
-	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /P=$pathName fileName
-=======
-	LoadWave /J /D /W /A /K=1 /E=2 /P=$pathName fileName
->>>>>>> parent of c5a2462... Corrected erros so data is concat
+ 
+	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /E=2 /P=$pathName fileName
 	Variable numWavesLoaded = V_flag			// V_flag is set by LoadWave
 
  
@@ -90,7 +82,7 @@ end
 // The output waves are: DateTimeW, CH4_dry, CO2_dry
 // All loaded waves are concatenated, creating the output waves in the current data folder.
 // If the output waves already exist in the current data folder, this routine appends to them.
-Function LoadAndConcatenateAllFiles(pathName)
+Function LoadEndBindings(pathName)
 	String pathName					// Name of symbolic path or "" to get dialog
 	String fileName
 	Variable index=0
@@ -116,19 +108,8 @@ Function LoadAndConcatenateAllFiles(pathName)
 			break									// Break out of loop
 		endif
  
- 		
- 
- 
 		// Load the new data into a temporary data folder
 		String dfName = "TempDataForLoadAndConcatenate"
-		
-		
-		if (DataFolderExists(dfName))
-		
-			KillDataFolder $dfName
-		endif	
-		
-		
 		NewDataFolder/O/S $dfName
  
 		result = LoadOneFile(pathName, fileName)
@@ -142,16 +123,16 @@ Function LoadAndConcatenateAllFiles(pathName)
 		endif
  
 		// Create wave references for the waves loaded into the temporary data folder
-		Wave EndBindIndexNew = :EndBindIndex
-		Wave EndBindTimeNew = :EndBindTime
+		Wave TimeStampNew = :TimeStamp
+		Wave EventLengthNew = :EventLength
 		
  
 		SetDataFolder ::				// Back to parent data folder
  
-		Wave DateTimeW, CH4_dry, CO2_dry
+		Wave EndBindIndex, EndBindTime
  
-		Concatenate /NP {EndBindIndexNew}, EndBindIndex
-		Concatenate /NP {EndBindTimeNew}, EndBindTime
+		Concatenate /NP {TimeStampNew}, EndBindIndex
+		Concatenate /NP {EventLengthNew}, EndBindTime
 		
  
 		KillDataFolder $dfName
@@ -165,7 +146,7 @@ Function LoadAndConcatenateAllFiles(pathName)
 		KillPath temporaryPath
 	endif
  
-	Wave EndBindIndex, CH4_dry, CO2_dry
+	Wave EndBindIndex, EndBindTime
 	
  
 	return 0						// Signifies success.
