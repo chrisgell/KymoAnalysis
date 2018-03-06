@@ -10,6 +10,14 @@ Mark roi for ends
 
 Then correct the ROIs - at the moment can only delete I think.
 
+
+TO DO NEXT!!!!!!!!!!
+Revisit the structure where all of the data is saved and make sure summary, latice and end events go into seperate folders
+these should be grouped otgether for analysis as appropriate - i.e. all of the streams for the same experiment on a given
+day etc...
+
+
+
 TO DO Write an igor routine that filters out unwanted events (i.e. only one wide).
 TO DO Extend the ROI tools so that you remove AND edit and create ROIs
 
