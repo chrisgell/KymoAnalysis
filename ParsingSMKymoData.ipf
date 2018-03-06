@@ -1,5 +1,5 @@
 //#pragma TextEncoding = "Windows-1252"
-//#pragma rtGlobals=3		// Use modern global access method and strict wave access.
+//#pragma rtGlobals=3		// Use modern global access method and strict wave access
 
  
 Menu "LoadWaves"
@@ -58,8 +58,7 @@ End
 
 
 
-// LoadOneFile(pathName, fileName)
-// Produces the following waves: DateTimeW, CH4_dry, CO2_dry
+//loads the summary file into waves backGroundRes	numLatticeEventsRes	numEndBindingsRes	mtLengthRes
 Function LoadSummaryFile(pathName, fileName)
 	String pathName		// Name of an Igor symbolic path or "".
 	String fileName			// Name of file or full path to file.
@@ -83,10 +82,10 @@ Function LoadSummaryFile(pathName, fileName)
  
  
  String columnInfoStr = " "
-	columnInfoStr += "N='TimeStamp';"			// Load DATE column - will become date/time wave
-	columnInfoStr += "N='EventLength';"			// Load TIME column
- 
- 
+	columnInfoStr += "N='backGroundRes';"			// Load DATE column - will become date/time wave
+	columnInfoStr += "N='numLatticeEventsRes';"			// Load TIME column
+ columnInfoStr += "N='numEndBindingsRes';"			// Load TIME column
+ columnInfoStr += "N='mtLengthRes';"			// Load TIME column
  
  
  
@@ -95,7 +94,7 @@ Function LoadSummaryFile(pathName, fileName)
 	Variable numWavesLoaded = V_flag			// V_flag is set by LoadWave
 
  
-	Wave DateTimeW,TimeW			// Create reference to waves created by LoadWave
+	
 	
  
 	return 0							// Success
@@ -355,7 +354,7 @@ End
 
 
 
-
+//backGroundRes	numLatticeEventsRes	numEndBindingsRes	mtLengthRes
 // Loads all files in specified folder with extension specified by kFileNameExtension.
 // All loaded waves are concatenated, creating the output waves in the current data folder.
 // If the output waves already exist in the current data folder, this routine appends to them.
@@ -364,10 +363,10 @@ Function LoadSummary(pathName)
 	String fileName
 	Variable index=0
  
-	Wave/D/Z SummaryBindIndex, SummaryBindTime
-	if (!WaveExists(SummaryBindIndex))						
+	Wave/D/Z SummaryBG, SummaryLatEvents,SummaryEndEvents,SummaryLength 
+	if (!WaveExists(SummaryBG))						
 		// Create the output waves because the code below concatenates	
-		Make/O/N=0/D SummaryBindIndex, SummaryBindTime
+		Make/O/N=0/D SummaryBG, SummaryLatEvents,SummaryEndEvents,SummaryLength
 	endif
  
 	if (strlen(pathName)==0)			// If no path specified, create one
@@ -401,32 +400,42 @@ Function LoadSummary(pathName)
  
  if (index ==0)
  
+ //backGroundRes	numLatticeEventsRes	numEndBindingsRes	mtLengthRes
+ 
 		// Create wave references for the waves loaded into the temporary data folder, need to account for their naming
-		Wave TimeStampNew = :TimeStamp
-		Wave EventLengthNew = :EventLength
+		Wave backGroundResNew = :backGroundRes
+		Wave numLatticeEventsResNew = :numLatticeEventsRes
+		Wave numEndBindingsResNew = :numEndBindingsRes
+		Wave mtLengthResNew = :mtLengthRes
 		
 else 
 
-		String LocTSName=":TimeStamp"+num2str(index)
-		String LocEventLengthName=":EventLength"+num2str(index)
+		String LocBGName=":backGroundRes"+num2str(index)
+		String LocLatNumName=":numLatticeEventsRes"+num2str(index)
+		String LocEndNumName=":numEndBindingsRes"+num2str(index)
+		String LocLengthName=":mtLengthRes"+num2str(index)
 		
 
 
 
-		Wave TimeStampNew = $LocTSName
-		Wave EventLengthNew =$LocEventLengthName
+		Wave backGroundResNew = $LocBGName
+		Wave numLatticeEventsResNew =$LocLatNumName
+		Wave numEndBindingsResNew = $LocEndNumName
+		Wave mtLengthResNew =$LocLengthName
 		
 endif		
 		
  
 		SetDataFolder ::				// Back to parent data folder
  
-		Wave SummaryBindIndex, SummaryBindTime
+			Wave SummaryBG, SummaryLatEvents,SummaryEndEvents,SummaryLength 
  
  
  
-		Concatenate /NP {TimeStampNew}, SummaryBindIndex
-		Concatenate /NP {EventLengthNew}, SummaryBindTime
+		Concatenate /NP {backGroundResNew}, SummaryBG
+		Concatenate /NP {numLatticeEventsResNew}, SummaryLatEvents
+		Concatenate /NP {numEndBindingsResNew}, SummaryEndEvents
+		Concatenate /NP {mtLengthResNew}, SummaryLength
 		
  
 		KillDataFolder $dfName
@@ -441,11 +450,11 @@ endif
 	endif
 	
 	 	//remove zeros
-	Wave SummaryBindIndex, SummaryBindTime
-	SummaryBindIndex = SummaryBindIndex == 0 ? NaN : SummaryBindIndex
-	WaveTransform zapNaNs SummaryBindIndex
-	SummaryBindTime = SummaryBindTime == 0 ? NaN : SummaryBindTime
-	WaveTransform zapNaNs SummaryBindTime
+	//Wave SummaryBindIndex, SummaryBindTime
+	//SummaryBindIndex = SummaryBindIndex == 0 ? NaN : SummaryBindIndex
+	//WaveTransform zapNaNs SummaryBindIndex
+	//SummaryBindTime = SummaryBindTime == 0 ? NaN : SummaryBindTime
+	//WaveTransform zapNaNs SummaryBindTime
 
 	KillDataFolder df4
  
