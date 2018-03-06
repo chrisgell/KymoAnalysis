@@ -4,7 +4,8 @@
  
 Menu "LoadWaves"
 	"Load One File...", LoadOneFile("", "")
-	"Load And Concatenate All Files in Folder...", LoadEndBindings("")
+	"Load End Bindings...", LoadEndBindings("")
+	"Load Lattice Events...", LoadLatticeBindings("")
 End
 
 
@@ -44,7 +45,7 @@ Function LoadOneFile(pathName, fileName)
  
  
  
-	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /E=2 /P=$pathName fileName
+	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /P=$pathName fileName
 	Variable numWavesLoaded = V_flag			// V_flag is set by LoadWave
 
  
@@ -162,8 +163,15 @@ endif
 		KillPath temporaryPath
 	endif
 	
-	RmvZeros()
-
+	 	//remove zeros
+	Wave EndBindIndex, EndBindTime
+	EndBindIndex = EndBindIndex == 0 ? NaN : EndBindIndex
+	WaveTransform zapNaNs EndBindIndex
+	EndBindTime = EndBindTime == 0 ? NaN : EndBindTime
+	WaveTransform zapNaNs EndBindTime
+	
+	
+KillDataFolder df4
 	
  
 	return 0						// Signifies success.
@@ -171,16 +179,6 @@ End
 
 
 
-Function RmvZeros()
-
- 	//remove zeros
-	Wave EndBindIndex, EndBindTime
-	EndBindIndex = EndBindIndex == 0 ? NaN : EndBindIndex
-	WaveTransform zapNaNs EndBindIndex
-	EndBindTime = EndBindTime == 0 ? NaN : EndBindTime
-	WaveTransform zapNaNs EndBindTime
-
-End
 
 
 Function RunAnalysis()
@@ -211,3 +209,101 @@ Label left "Occurance"
 End
 
 
+
+
+// LoadAndConcatenateAllFiles(pathName)
+// Loads all files in specified folder with extension specified by kFileNameExtension.
+// All loaded waves are concatenated, creating the output waves in the current data folder.
+// If the output waves already exist in the current data folder, this routine appends to them.
+Function LoadLatticeBindings(pathName)
+	String pathName					// Name of symbolic path or "" to get dialog
+	String fileName
+	Variable index=0
+ 
+	Wave/D/Z LatBindIndex, LatBindTime
+	if (!WaveExists(LatBindIndex))						
+		// Create the output waves because the code below concatenates	
+		Make/O/N=0/D LatBindIndex, LatBindTime
+	endif
+ 
+	if (strlen(pathName)==0)			// If no path specified, create one
+		NewPath/O temporaryPath		// This will put up a dialog
+		if (V_flag != 0)
+			return -1					// User cancelled
+		endif
+		pathName = "temporaryPath"
+	endif
+ 
+	Variable result
+	do			// Loop through each file in folder
+		fileName = IndexedFile($pathName, index, kFileNameExtension)
+		if (strlen(fileName) == 0)			// No more files?
+			break									// Break out of loop
+		endif
+ 
+		// Load the new data into a temporary data folder
+		String dfName = "TempDataForLoadAndConcatenate"
+		NewDataFolder/O/S $dfName
+ 
+		result = LoadOneFile(pathName, fileName)
+		if (result != 0)
+			String message
+			sprintf message, "An error occurred while loading the file \"%s\". Aborting the load.\r", fileName
+			Print message
+			DoAlert 0, message
+			KillDataFolder $dfName
+			break		
+		endif
+ 
+ if (index ==0)
+ 
+		// Create wave references for the waves loaded into the temporary data folder, need to account for their naming
+		Wave TimeStampNew = :TimeStamp
+		Wave EventLengthNew = :EventLength
+		
+else 
+
+		String LocTSName=":TimeStamp"+num2str(index)
+		String LocEventLengthName=":EventLength"+num2str(index)
+		
+
+
+
+		Wave TimeStampNew = $LocTSName
+		Wave EventLengthNew =$LocEventLengthName
+		
+endif		
+		
+ 
+		SetDataFolder ::				// Back to parent data folder
+ 
+		Wave LatBindIndex, LatBindTime
+ 
+ 
+ 
+		Concatenate /NP {TimeStampNew}, LatBindIndex
+		Concatenate /NP {EventLengthNew}, LatBindTime
+		
+ 
+		KillDataFolder $dfName
+ 
+		Printf "Loaded file %d: \"%s\"\r", index, fileName
+ 
+		index += 1
+	while (1)
+ 
+	if (Exists("temporaryPath"))		// Kill temp path if it exists
+		KillPath temporaryPath
+	endif
+	
+	 	//remove zeros
+	Wave LatBindIndex, LatBindTime
+	LatBindIndex = LatBindIndex == 0 ? NaN : LatBindIndex
+	WaveTransform zapNaNs EndBindIndex
+	LatBindTime = LatBindTime == 0 ? NaN : LatBindTime
+	WaveTransform zapNaNs LatBindTime
+
+	KillDataFolder df4
+ 
+	return 0						// Signifies success.
+End
