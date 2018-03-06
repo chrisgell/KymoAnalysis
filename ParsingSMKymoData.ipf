@@ -4,7 +4,7 @@
  
 Menu "LoadWaves"
 	"Load One File...", LoadOneFile("", "")
-	"Load And Concatenate All Files in Folder...", LoadEndBindings("")
+	"Load And Concatenate All End Bindings...", LoadEndBindings("")
 End
 
 
