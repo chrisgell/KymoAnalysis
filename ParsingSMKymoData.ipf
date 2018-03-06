@@ -131,6 +131,10 @@ Function LoadEndBindings(pathName)
  
 		Wave EndBindIndex, EndBindTime
  
+ 
+ //need to sort out why this does not concat here - it works by re-adds the same waves.... the first one. Need to make 
+ //time stamp new concat the correct wave.
+ 
 		Concatenate /NP {TimeStampNew}, EndBindIndex
 		Concatenate /NP {EventLengthNew}, EndBindTime
 		
