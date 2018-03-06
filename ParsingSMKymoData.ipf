@@ -4,7 +4,11 @@
  
 Menu "LoadWaves"
 	"Load One File...", LoadOneFile("", "")
+<<<<<<< HEAD
 	"Load And Concatenate All End Bindings...", LoadEndBindings("")
+=======
+	"Load And Concatenate All Files in Folder...", LoadAndConcatenateAllFiles("")
+>>>>>>> parent of c5a2462... Corrected erros so data is concat
 End
 
 
@@ -34,6 +38,7 @@ Function LoadOneFile(pathName, fileName)
 	String thisPathForDF="root:df4"
 	SetCommonDF(thisPathForDF)
  
+<<<<<<< HEAD
  
  String columnInfoStr = " "
 	columnInfoStr += "N='TimeStamp';"			// Load DATE column - will become date/time wave
@@ -45,6 +50,9 @@ Function LoadOneFile(pathName, fileName)
  
  //LoadWave /J /D /W /B=columnInfoStr /A /K=1 /E=2 /P=$pathName fileName
 	LoadWave /J /D /W /B=columnInfoStr /A /K=1 /P=$pathName fileName
+=======
+	LoadWave /J /D /W /A /K=1 /E=2 /P=$pathName fileName
+>>>>>>> parent of c5a2462... Corrected erros so data is concat
 	Variable numWavesLoaded = V_flag			// V_flag is set by LoadWave
 
  
@@ -82,7 +90,7 @@ end
 // The output waves are: DateTimeW, CH4_dry, CO2_dry
 // All loaded waves are concatenated, creating the output waves in the current data folder.
 // If the output waves already exist in the current data folder, this routine appends to them.
-Function LoadEndBindings(pathName)
+Function LoadAndConcatenateAllFiles(pathName)
 	String pathName					// Name of symbolic path or "" to get dialog
 	String fileName
 	Variable index=0
@@ -134,16 +142,16 @@ Function LoadEndBindings(pathName)
 		endif
  
 		// Create wave references for the waves loaded into the temporary data folder
-		Wave TimeStampNew = :TimeStamp
-		Wave EventLengthNew = :EventLength
+		Wave EndBindIndexNew = :EndBindIndex
+		Wave EndBindTimeNew = :EndBindTime
 		
  
 		SetDataFolder ::				// Back to parent data folder
  
-		Wave EndBindIndex, EndBindTime
+		Wave DateTimeW, CH4_dry, CO2_dry
  
-		Concatenate /NP {TimeStampNew}, EndBindIndex
-		Concatenate /NP {EventLengthNew}, EndBindTime
+		Concatenate /NP {EndBindIndexNew}, EndBindIndex
+		Concatenate /NP {EndBindTimeNew}, EndBindTime
 		
  
 		KillDataFolder $dfName
@@ -157,7 +165,7 @@ Function LoadEndBindings(pathName)
 		KillPath temporaryPath
 	endif
  
-	Wave EndBindIndex, EndBindTime
+	Wave EndBindIndex, CH4_dry, CO2_dry
 	
  
 	return 0						// Signifies success.
