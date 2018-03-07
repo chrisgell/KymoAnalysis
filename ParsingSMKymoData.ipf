@@ -2,7 +2,7 @@
 //#pragma rtGlobals=3		// Use modern global access method and strict wave access.
 
  
-Menu "LoadWaves"
+Menu "LoadKymoAnalysisResults"
 	"Load End Bindings...", LoadEndBindings("")
 	"Load Lattice Events...", LoadLatticeBindings("")
 	"Load Summary Data...", LoadSummary("")
