@@ -180,7 +180,7 @@ run("Erode");
 //*****************************************************************************************************************
 selectImage(gfpOnlyID);
 roiManager("select", 3)
-run("Analyze Particles...", "size=2-Infinity show=Outlines add");
+run("Analyze Particles...", "size=2-Infinity add");
 //Rename the ROIs
 
 n=roiManager("count");
@@ -279,7 +279,7 @@ numLatticeEvents=numRois-4;
 //*****************************************************************************************************************
 selectImage(gfpOnlyID);
 roiManager("select", 1)
-run("Analyze Particles...", "size=2-Infinity show=Outlines add");
+run("Analyze Particles...", "size=2-Infinity add");
 selectWindow(kymoImageName);
 roiManager("show all");
 n=roiManager("count");
@@ -363,7 +363,7 @@ numEndBindings=numRois-4;
 //*****************************************************************************************************************
 selectImage(gfpOnlyID);
 roiManager("select", 2)
-run("Analyze Particles...", "size=2-Infinity show=Outlines add");
+run("Analyze Particles...", "size=2-Infinity add");
 selectWindow(kymoImageName);
 roiManager("show all");
 n=roiManager("count");
