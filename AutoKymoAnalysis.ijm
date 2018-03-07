@@ -36,6 +36,8 @@ DONE Best to put these in a log window and save all into a folder with same name
 //Need to make sure that a bounding rectangle is fit for the measurements
 run("Set Measurements...", "bounding redirect=None decimal=3");
 
+//waitForUser( "Pause","Set options");
+
 //Time spacing
 frameInt=0.1;
 pxSize=0.1;
@@ -497,6 +499,10 @@ roiManager("select", 1);
        run("Close"); 
    }
 
-
+//clear the ROI manager
+if (roiManager("count") !=0)  {
+roiManager("deselect");
+roiManager("delete");
+}
 
 
