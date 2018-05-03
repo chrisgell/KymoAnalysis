@@ -1,6 +1,6 @@
 /*
  * Chris Gell
- * Dec 2018
+ * 8th May 2018
  * 
  * Semi-automated analysis of kymographs.
  * Load a red-green kymoe, when prompted 
@@ -8,8 +8,9 @@ Mark ROIS for bg
 Mark ROI for non-ends
 Mark roi for ends
 
-Then correct the ROIs - at the moment can only delete I think.
+Then correct the ROIs, you can delete and add new ones (T key) as necessary. Not sensible to try to edit existing ones.
 
+Note that it's necessary to edit the pizel size and time interval in code.
 
 TO DO NEXT!!!!!!!!!!
 Revisit the structure where all of the data is saved and make sure summary, latice and end events go into seperate folders
@@ -19,7 +20,8 @@ day etc...
 
 
 TO DO Write an igor routine that filters out unwanted events (i.e. only one wide).
-TO DO Extend the ROI tools so that you remove AND edit and create ROIs
+To DO Need to a way for user to change the pixel size and time spacing.
+
 
 DONE Need to make sure all ori are saved
 DONE Need the MT length
@@ -38,10 +40,13 @@ run("Set Measurements...", "bounding redirect=None decimal=3");
 
 //waitForUser( "Pause","Set options");
 
-//Time spacing
-frameInt=0.1;
-pxSize=0.1;
-
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+//EDIT THIS************************************************
+//Time and spacing
+frameInt=0.1; //Time lapse in seconds
+pxSize=0.1;	//pixel size in microns
+//*******************************************************
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 //clear the ROI manager
 if (roiManager("count") !=0)  {
@@ -72,6 +77,9 @@ selectWindow(kymoImageName);
 kymoID=getImageID();
 
 
+screenH = screenHeight;
+screenW = screenWidth;
+setLocation(200,0,500,screenH-50);
 
 
 
@@ -80,58 +88,62 @@ selectWindow(kymoImageName);
 run("Select None");
 imgHeight=getHeight();
 imgWidth=getWidth();
-
+setTool("rectangle");
 
 
 //wait for the user
-makeRectangle(0, 0, 6, imgHeight);
-waitForUser( "Pause","Draw the ROI bg, click OK.");
+makeRectangle(5, imgHeight/4, 6, imgHeight/3);
+waitForUser( "Pause","Draw a BACKGROUND ROI then click OK.");
 roiManager("add");
 roiManager("select", 0)
 roiManager("rename", "BG");
-roiManager("Set Color", "blue");
-roiManager("Set Line Width", 1);
+roiManager("Set Color", "white");
+roiManager("Set Line Width", 0.1);
 
 selectWindow(kymoImageName);
 run("Select None");
 //wait for the user
 makeRectangle(10, 0, 6, imgHeight);
-waitForUser( "Pause","Draw the ROI left end, click OK.");
+waitForUser( "Pause","Draw the LEFT END ROI then click OK.");
 roiManager("add");
 roiManager("select", 1)
 roiManager("rename", "LeftEnd");
 roiManager("Set Color", "red");
-roiManager("Set Line Width", 1);
+roiManager("Set Line Width", 0.1);
 
 selectWindow(kymoImageName);
 run("Select None");
 //wait for the user
 makeRectangle(imgWidth-20, 0, 6, imgHeight);
-waitForUser( "Pause","Draw the ROI right end, click OK.");
+waitForUser( "Pause","Draw the RIGHT END ROI then click OK.");
 roiManager("add");
 roiManager("select", 2)
 roiManager("rename", "RightEnd");
 roiManager("Set Color", "red");
-roiManager("Set Line Width", 1);
+roiManager("Set Line Width", 0.1);
 
 selectWindow(kymoImageName);
 run("Select None");
 //wait for the user
 imgCent=round(imgWidth/2);
 makeRectangle(imgCent, 0, 20, imgHeight);
-waitForUser( "Pause","Draw the ROI lattice, click OK.");
+waitForUser( "Pause","Draw the LATTICE ROI then click OK.");
 roiManager("add");
 roiManager("select", 3)
 roiManager("rename", "Lattice");
 roiManager("Set Color", "blue");
-roiManager("Set Line Width", 1);
+roiManager("Set Line Width", 0.1);
 roiManager("show none");
 run("Select None");
 
 
 
+//Hide the tube image, makes it easier to see the events and have the ROIS now.
+selectWindow(kymoImageName);
+Stack.setActiveChannels("10");
+
 //create a dir to store everything
-dir = getDirectory("Choose a Directory");
+dir = getDirectory("Choose a Directory where the ROI and results will be saved.");
 //File.makeDirectory(dir); 
 newDir=dir;
 
@@ -162,7 +174,7 @@ roiManager("select", 0);
 getStatistics(area, mean, min, max);
 backGround=max;
 
-
+setBatchMode(true);
 
 //run("Threshold...");
 selectImage(gfpOnlyID);
@@ -173,6 +185,8 @@ run("Convert to Mask");
 //this simulate the joning conditions - this is the really hard bit to do quickly though.
 run("Dilate");
 run("Erode");
+
+setBatchMode(false);
 
 
 
@@ -198,7 +212,7 @@ tempEventName=1;
 
 selectWindow(kymoImageName);
 roiManager("show all");
-waitForUser( "Pause","Please edit ROIs as necessary, click OK.");
+waitForUser( "Pause","Please add/remove the LATTICE events as necessary then click OK.");
 
 
 
@@ -222,11 +236,14 @@ numRois=roiManager("count");
 roiManager("deselect");
 roiManager("Measure");
 
+setBatchMode(true);
+
 //Read out the data you need and put it in a new table
 	count=4;
 	n = numRois; 
     eventHeightLat = newArray(n);
     eventLabelLat = newArray(n);
+
  
 
     eventCount=1;
@@ -293,7 +310,7 @@ tempEventName=1;
 		roiManager("rename", "L"+tempEventName);
 		tempEventName++;    
     } 
-waitForUser( "Pause","Please edit ROIs as necessary, click OK.");
+waitForUser( "Pause","Please edit the LEFT END events as necessary then click OK.");
 
 //make sure these are recorded
 roiManager("deselect");
@@ -377,7 +394,7 @@ tempEventName=1;
 		roiManager("rename", "R"+tempEventName);
 		tempEventName++;    
     } 
-waitForUser( "Pause","Please edit ROIs as necessary, click OK.");
+waitForUser( "Pause","Please edit the RIGHT END events as necessary then click OK.");
 
 //make sure these are recorded
 roiManager("deselect");
