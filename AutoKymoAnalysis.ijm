@@ -110,6 +110,7 @@ roiManager("select", 1)
 roiManager("rename", "LeftEnd");
 roiManager("Set Color", "red");
 roiManager("Set Line Width", 0.1);
+Roi.getBounds(leROIx, leROIy, leROIwidth, leROIheight);
 
 selectWindow(kymoImageName);
 run("Select None");
@@ -121,13 +122,14 @@ roiManager("select", 2)
 roiManager("rename", "RightEnd");
 roiManager("Set Color", "red");
 roiManager("Set Line Width", 0.1);
+Roi.getBounds(reROIx, reROIy, reROIwidth, reROIheight);
 
 selectWindow(kymoImageName);
 run("Select None");
 //wait for the user
 imgCent=round(imgWidth/2);
-makeRectangle(imgCent, 0, 20, imgHeight);
-waitForUser( "Pause","Draw the LATTICE ROI then click OK.");
+makeRectangle(leROIx+leROIwidth, 0, reROIx-leROIx-leROIwidth, imgHeight);
+waitForUser( "Pause","Edit the LATTICE ROI if necessary then click OK.");
 roiManager("add");
 roiManager("select", 3)
 roiManager("rename", "Lattice");
@@ -173,6 +175,7 @@ roiManager("select", 0);
 
 getStatistics(area, mean, min, max);
 backGround=max;
+print("Background  is "+backGround);
 
 setBatchMode(true);
 
