@@ -460,3 +460,28 @@ endif
  
 	return 0						// Signifies success.
 End
+
+
+macro plotData()
+
+Edit EndBindTime,LatBindTime,SummaryEndEvents,SummaryLatEvents,SummaryLength
+•Make/N=100/O EndBindTime_Hist;DelayUpdate
+•Histogram/B={0,0.1,100} EndBindTime,EndBindTime_Hist;DelayUpdate
+•Display EndBindTime_Hist
+•ModifyGraph mode=5
+•ModifyGraph mode=5
+•SetAxis left *,30
+•SetAxis/A
+•Label bottom "time (s)"
+•Label left "Num events"
+•Make/N=100/O LatBindTime_Hist;DelayUpdate
+•Histogram/B={0,0.1,100} LatBindTime,LatBindTime_Hist;DelayUpdate
+•Display LatBindTime_Hist
+•ModifyGraph mode=5
+•ModifyGraph mode=5
+•SetAxis left *,30
+•SetAxis/A
+•Label bottom "time (s)"
+•Label left "Num events"
+
+End
