@@ -1,39 +1,53 @@
+
+
 /*
  * Chris Gell
- * 8th May 2018
+ * 9th May 2018
  * 
  * Semi-automated analysis of kymographs.
- * Load a red-green kymoe, when prompted 
-Mark ROIS for bg
-Mark ROI for non-ends
-Mark roi for ends
+ * 
+ * Load a red-green kymoe, select it in the drop down, enter the pizel size and time interval in code. When prompted mark ROIS for bg,
+mark ROI for non-ends, mark roi for ends. The software will then thresholds and analyze particles using the max background pixel value as the threshold
+Then correct the event ROIs, you can delete ROIs by following the prompts and clicking on them.
+If you wish to see a threshoded image use the B tool. Not sensible to try to edit existing ones. But you can then add new one (make sure to hit 't' to
+add them to the ROI manager.
 
-Then correct the ROIs, you can delete and add new ones (T key) as necessary. Not sensible to try to edit existing ones.
 
-Note that it's necessary to edit the pizel size and time interval in code.
+
 
 TO DO NEXT!!!!!!!!!!
 Revisit the structure where all of the data is saved and make sure summary, latice and end events go into seperate folders
 these should be grouped otgether for analysis as appropriate - i.e. all of the streams for the same experiment on a given
 day etc...
 
-TO DO - Make a shortcut to delete currently selected ROI in the manager.
+
 
 TO DO Write an igor routine that filters out unwanted events (i.e. only one wide).
-To DO Need to a way for user to change the pixel size and time spacing.
+
+
 
 
 DONE Need to make sure all ori are saved
 DONE Need the MT length
 DONE Need total number sof each event
 DONE Best to put these in a log window and save all into a folder with same name as the kymo 
-
+DONE- Make a shortcut to delete currently selected ROI in the manager.
+DONE Need to a way for user to change the pixel size and time spacing. Perhaps other parameters too.
+Half DONE Have ROI's in an ROI deleted? - now able to click a ROI to delete it. Not sure can do much else in a macro.
+DONE Undo ROI delete? - Made it less likely to cause a problem.
+DONE Click 1 pixel event
 
 
 
 
 
 */
+
+//print (getDirectory("plugins"));
+
+//Load any toolbar buttons needed.
+run("Install...", "install=["+getDirectory("plugins")+"Scripts\\SLIM\\Friel\\Friel Dependencies\\Auto_Kymo_Add1px_ToolBar.ijm]");
+
 
 //Need to make sure that a bounding rectangle is fit for the measurements
 run("Set Measurements...", "bounding redirect=None decimal=3");
@@ -45,6 +59,16 @@ run("Set Measurements...", "bounding redirect=None decimal=3");
 //Time and spacing
 frameInt=0.1; //Time lapse in seconds
 pxSize=0.1;	//pixel size in microns
+title = "Set parameters";
+width=1024; height=1024;
+Dialog.create("Set parameters");
+Dialog.addNumber("Time interval (s)", frameInt);
+Dialog.addNumber("Pixel size (um)", pxSize);
+Dialog.show();
+frameInt = Dialog.getNumber();
+pxSize = Dialog.getNumber();
+//print (frameInt);
+//print (pxSize);
 //*******************************************************
 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -54,7 +78,11 @@ roiManager("deselect");
 roiManager("delete");
 }
 
-roiManager("show all");
+
+//set up the ROI manager in a good way.
+ roiManager("Show All with labels"); 
+ roiManager("UseNames", "true"); 
+ 
 
 
 
@@ -213,18 +241,13 @@ tempEventName=1;
     } 
 
 
+
+
 selectWindow(kymoImageName);
 roiManager("show all");
-waitForUser( "Pause","Please add/remove the LATTICE events as necessary then click OK.");
-
-
-
-
-
-
-
-
-
+waitForUser( "Pause","Press Ok to enter delete mode to remove unwanted lattice events, \n (click on ROI label to remove them). \nClose the log window when you are done to continue.");
+run("Auto Kymo Keys"); //Activate the Event Deletion tool
+waitForUser( "Pause","Now add any missing LATTICE events as necessary (draw then 't'), then click OK.\n Use the + toolbar to add 1px (in time) events.");
 
 
 
@@ -244,8 +267,8 @@ setBatchMode(true);
 //Read out the data you need and put it in a new table
 	count=4;
 	n = numRois; 
-    eventHeightLat = newArray(n);
-    eventLabelLat = newArray(n);
+    eventHeightLat = newArray(n-4);
+    eventLabelLat = newArray(n-4);
 
  
 
@@ -335,8 +358,8 @@ roiManager("Measure");
 //Read out the data you need and put it in a new table
 	count=4;
 	n = numRois; 
-    eventHeightLE = newArray(n);
-    eventLabelLE = newArray(n);
+    eventHeightLE = newArray(n-4);
+    eventLabelLE = newArray(n-4);
  
 
     eventCount=1;
@@ -413,8 +436,8 @@ roiManager("Measure");
 //Read out the data you need and put it in a new table
 	count=4;
 	n = numRois; 
-    eventHeightRE = newArray(n);
-    eventLabelRE = newArray(n);
+    eventHeightRE = newArray(n-4);
+    eventLabelRE = newArray(n-4);
  
 
     eventCount=1;
@@ -524,5 +547,8 @@ if (roiManager("count") !=0)  {
 roiManager("deselect");
 roiManager("delete");
 }
+
+
+
 
 
