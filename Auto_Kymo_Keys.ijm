@@ -22,9 +22,14 @@
   if (x!=x2 || y!=y2 || z!=z2 || flags!=flags2) {  // Only when mouse moves new locatation is logged 
   wait(20);      // Might have to be increased with large number of ROIs 
                if (flags&leftButton!=0) { 
-    if (roiManager("index")!=-1)  // Check that a ROI is selected 
+    if (roiManager("index")!=-1){  // Check that a ROI is selected 
+     
+    if( roiManager("index") >=4) {
      roiManager("Delete"); 
-    } 
+    }
+    
+    }
+               } 
                logOpened = true; 
     } 
            x2=x; y2=y; z2=z; flags2=flags;    // Only when mouse moves new location is logged 
